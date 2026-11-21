@@ -31,7 +31,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans TC
 .hd,h1{font-family:"Noto Sans TC",sans-serif;font-weight:700}
 main{max-width:1200px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:10px max(2vw,10px)}
 .lab{display:flex;align-items:center;gap:8px;margin:0 0 4px;font:700 15px/1.2 "Noto Sans TC",sans-serif;color:var(--ink)}.lab img{height:34px;width:auto;display:block;background:#fff;border-radius:8px;padding:4px 6px;box-sizing:content-box;border:1px solid #d6d2c4}
-h1{margin:0 0 2px;font-size:clamp(22px,3.6vw,36px);line-height:1.05}
+h1{margin:0 0 4px;font-size:clamp(22px,3.6vw,36px);line-height:1.1;color:#ffd54f;text-shadow:-2px -2px 0 #1b1b1b,2px -2px 0 #1b1b1b,-2px 2px 0 #1b1b1b,2px 2px 0 #1b1b1b,0 -2px 0 #1b1b1b,0 2px 0 #1b1b1b,-2px 0 0 #1b1b1b,2px 0 0 #1b1b1b,3px 4px 0 rgba(0,0,0,.35)}
 .sub{margin:0 0 8px;color:var(--mute);max-width:90ch;font-size:15px}
 .cab{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;background:var(--stone);color:#ececec;padding:10px;border:4px solid var(--edge);box-shadow:inset 3px 3px 0 #626262,inset -3px -3px 0 #262626}
 .hud .snd{min-height:44px;border:3px solid var(--edge);background:#5a5a5a;color:#fff;font:700 15px "Noto Sans TC",sans-serif;padding:0 14px;cursor:pointer}
@@ -53,7 +53,8 @@ h1{margin:0 0 2px;font-size:clamp(22px,3.6vw,36px);line-height:1.05}
 .tbtn.on{transform:scale(.92);filter:brightness(1.2)}
 .tlogo{display:none;position:absolute;left:8px;top:8px;height:34px;width:auto;background:#fff;border-radius:8px;padding:3px 5px;pointer-events:none}
 .olab{display:none;align-items:center;gap:8px;margin:0 0 6px;font:700 13px/1.2 "Noto Sans TC",sans-serif;color:#fff}.olab img{height:26px;background:#fff;border-radius:6px;padding:2px 4px}
-@media (pointer:coarse){.olab{display:flex}}
+.otitle{display:none;font:700 22px/1.2 "Noto Sans TC",sans-serif;color:#ffd54f;margin:0 0 6px}
+@media (pointer:coarse){.olab{display:flex}.otitle{display:block}}
 .tsnd{position:absolute;right:8px;top:8px;border:2px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);color:#fff;font:700 12px "Noto Sans TC",sans-serif;padding:4px 10px}
 .rot{display:none;position:absolute;left:50%;top:8px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font:12px "Noto Sans TC",sans-serif;padding:4px 10px;white-space:nowrap;pointer-events:none}
 @media (pointer:coarse){.tc{display:block}.pad{display:none!important}}
@@ -351,7 +352,7 @@ function endMatch(won){
 }
 function chooser(){
  run=false;ov.classList.remove('center');ov.hidden=false;say('Choose who you want to play against.');
- $('ovIn').innerHTML=`<div class="olab"><img src="${LOGO}" alt="">廖誼青博士 精準營養學研究室</div><h2>Choose your opponent</h2><p>You are <b>α-Ketoglutarate</b>. Who do you want to play against?</p>
+ $('ovIn').innerHTML=`<div class="olab"><img src="${LOGO}" alt="">廖誼青博士 精準營養學研究室</div><div class="otitle">Transamination reactions</div><h2>Choose your opponent</h2><p>You are <b>α-Ketoglutarate</b>. Who do you want to play against?</p>
   <div class="pick">${LV.map((L,n)=>`<button class="pk" data-n="${n}"><canvas width="300" height="170"></canvas><b>${AA[L.opp]}</b><span>Enzyme at the net: ${L.e} · ${n?'harder':'easier'}</span></button>`).join('')}</div>`;
  ov.querySelectorAll('.pk').forEach(bt=>{const n=+bt.dataset.n,L=LV[n],c=bt.querySelector('canvas').getContext('2d');
   c.fillStyle='#cbe8ff';c.fillRect(0,0,300,170);c.fillStyle='#5fa83b';c.fillRect(0,150,300,20);drawStruct(c,'a'+L.opp,150,100,24,1,false);
@@ -360,7 +361,7 @@ function chooser(){
  ov.querySelector('.pk').focus({preventScroll:true});ov.scrollTop=0;
 }
 function moveP(p,dir,jump,dt){
- const top=360*(COARSE&&p===S.me?1.4:1);if(COARSE&&p===S.me){p.vx=p.dragV||0;p.x+=(p.dragStep||0)-p.vx*dt;p.dragStep=0}else p.vx+=(dir*top-p.vx)*Math.min(1,dt*16);
+ const top=360*(COARSE&&p===S.me?1.4:1);if(COARSE&&p===S.me){p.vx=p.dragV||0;p.x+=(p.dragStep||0)-p.vx*dt;p.dragStep=0}else if(p===S.me)p.vx=dir*480;else p.vx+=(dir*top-p.vx)*Math.min(1,dt*16);
  if(jump&&p.on){p.vy=-820;p.on=0}
  p.vy+=PG*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
  if(p.y>=GROUND-27){p.y=GROUND-27;p.vy=0;p.on=1}
@@ -467,6 +468,7 @@ addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(!run)return;
  if(k==='arrowup'||k==='w'){e.preventDefault();if(!e.repeat)input.jump=1}
  if(k===' '||k==='x'||k==='enter'){e.preventDefault();if(!e.repeat)input.hit=1}});
 addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(KM[k])input[KM[k]]=0});
+addEventListener('blur',()=>{input.left=input.right=0});
 $('snd').onclick=()=>{audio();sndOn=!sndOn;$('snd').textContent='Sound: '+(sndOn?'on':'off');$('snd').setAttribute('aria-pressed',sndOn);$('snd').blur()};
 $('pad').querySelectorAll('button').forEach(b=>{const k=b.dataset.k;
  b.addEventListener('pointerdown',e=>{e.preventDefault();if(k==='jump'||k==='hit')input[k]=1;else input[k]=1});
